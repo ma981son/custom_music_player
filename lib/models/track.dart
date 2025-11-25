@@ -6,7 +6,8 @@ class Track {
   final String? artist;
   final String? album;
   final Duration? duration;
-  final int? albumId; // ← Make sure this exists!
+  final int? albumId;
+  final DateTime? dateAdded; // ADD THIS
 
   Track({
     required this.id,
@@ -15,6 +16,7 @@ class Track {
     this.artist,
     this.album,
     this.duration,
-    this.albumId, // ← Make sure this exists!
+    this.albumId,
+    this.dateAdded, // ADD THIS
   });
 }

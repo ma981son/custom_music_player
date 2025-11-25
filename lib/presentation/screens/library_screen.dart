@@ -75,40 +75,17 @@ class LibraryScreen extends StatelessWidget {
           // Track list with header
           return Column(
             children: [
-              // Header
-              Container(
-                padding: EdgeInsets.all(16),
-                color: Colors.grey[200],
-                child: Row(
-                  children: [
-                    Icon(Icons.music_note),
-                    SizedBox(width: 8),
-                    Text(
-                      '${state.tracks.length} tracks',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
               // Reusable track list
               Expanded(
                 child: TrackListWidget(
                   tracks: state.tracks,
+                  showShuffleBar: true,
+                  currentSortOption: state.sortOption,
+                  onSortOptionChanged: (option) {
+                    context.read<LibraryController>().setSortOption(option);
+                  },
                   onTrackTap: (track, index) {
                     context.read<PlaybackController>().play(track);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Playing: ${track.title}'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  },
-                  onTrackLongPress: (track, index) {
-                    _showTrackOptions(context, track);
                   },
                 ),
               ),

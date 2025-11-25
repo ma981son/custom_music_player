@@ -77,6 +77,7 @@ class MediaStorePlugin : FlutterPlugin, MethodCallHandler {
             val albumIdColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
             val pathColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
             val durationColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val dateAddedColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
 
             while (it.moveToNext()) {
                 val id = it.getLong(idColumn)
@@ -86,6 +87,7 @@ class MediaStorePlugin : FlutterPlugin, MethodCallHandler {
                 val albumId = it.getLong(albumIdColumn)
                 val path = it.getString(pathColumn)
                 val duration = it.getLong(durationColumn)
+                val dateAdded = it.getLong(dateAddedColumn)
 
                 tracks.add(
                     mapOf(
@@ -95,7 +97,8 @@ class MediaStorePlugin : FlutterPlugin, MethodCallHandler {
                         "album" to album,
                         "filePath" to path,
                         "duration" to duration,
-                        "albumId" to albumId  // Return albumId to fetch art later
+                        "albumId" to albumId,
+                        "dateAdded" to dateAdded
                     )
                 )
             }

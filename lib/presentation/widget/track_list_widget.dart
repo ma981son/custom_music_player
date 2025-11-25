@@ -1,6 +1,8 @@
 // lib/presentation/widgets/track_list_widget.dart
 import 'package:flutter/material.dart';
+import 'package:music_player_final/models/sort_option.dart';
 import 'package:music_player_final/models/track.dart';
+import 'package:music_player_final/presentation/widget/shuffle_bar_widget.dart';
 import 'album_art_widget.dart';
 
 class TrackListWidget extends StatelessWidget {
@@ -10,8 +12,12 @@ class TrackListWidget extends StatelessWidget {
   final Widget Function(Track track, int index)? trailingBuilder;
   final bool showTrackNumber;
   final bool showDuration;
+  final bool showShuffleBar;
+  final void Function(Track track, int index)? onShuffleTap;
   final ScrollController? scrollController;
   final EdgeInsets? padding;
+  final SortOption currentSortOption;
+  final void Function(SortOption option)? onSortOptionChanged;
 
   const TrackListWidget({
     super.key,
@@ -23,6 +29,10 @@ class TrackListWidget extends StatelessWidget {
     this.showDuration = true,
     this.scrollController,
     this.padding,
+    required this.showShuffleBar,
+    this.onShuffleTap,
+    required this.currentSortOption,
+    this.onSortOptionChanged,
   });
 
   @override
@@ -43,24 +53,42 @@ class TrackListWidget extends StatelessWidget {
       );
     }
 
-    return ListView.builder(
-      controller: scrollController,
-      padding: padding,
-      itemCount: tracks.length,
-      itemBuilder: (context, index) {
-        final track = tracks[index];
-        return TrackListTile(
-          track: track,
-          index: index,
-          showTrackNumber: showTrackNumber,
-          showDuration: showDuration,
-          onTap: onTrackTap != null ? () => onTrackTap!(track, index) : null,
-          onLongPress: onTrackLongPress != null
-              ? () => onTrackLongPress!(track, index)
-              : null,
-          trailing: trailingBuilder?.call(track, index),
-        );
-      },
+    return Column(
+      children: [
+        if (showShuffleBar)
+          ShuffleBarWidget(
+            tracks: tracks,
+            onShuffleTap: onShuffleTap,
+            onFallbackTap: onTrackTap,
+            currentSortOption: currentSortOption,
+            onSortOptionChanged: onSortOptionChanged,
+          ),
+        Expanded(
+          child: ListView.builder(
+            controller: scrollController,
+            padding: padding,
+            itemCount: tracks.length,
+            itemBuilder: (context, index) {
+              final track = tracks[index];
+
+              return TrackListTile(
+                key: ValueKey(track.filePath),
+                track: track,
+                index: index,
+                showTrackNumber: showTrackNumber,
+                showDuration: showDuration,
+                onTap: onTrackTap != null
+                    ? () => onTrackTap!(track, index)
+                    : null,
+                onLongPress: onTrackLongPress != null
+                    ? () => onTrackLongPress!(track, index)
+                    : null,
+                trailing: trailingBuilder?.call(track, index),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

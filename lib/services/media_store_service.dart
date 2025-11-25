@@ -25,6 +25,11 @@ class MediaStoreService {
               ? Duration(milliseconds: (data['duration'] as int))
               : null,
           albumId: data['albumId'] as int?,
+          dateAdded: data['dateAdded'] != null
+              ? DateTime.fromMillisecondsSinceEpoch(
+                  (data['dateAdded'] as int) * 1000,
+                )
+              : null,
         );
 
         // DEBUG: Print first track's albumId
