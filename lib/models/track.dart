@@ -6,6 +6,7 @@ class Track {
   final String? artist;
   final String? album;
   final Duration? duration;
+  final int? albumId; // ← Make sure this exists!
 
   Track({
     required this.id,
@@ -14,8 +15,6 @@ class Track {
     this.artist,
     this.album,
     this.duration,
+    this.albumId, // ← Make sure this exists!
   });
-
-  @override
-  String toString() => 'Track(title: $title, artist: $artist)';
 }
