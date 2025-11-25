@@ -1,7 +1,8 @@
 // lib/presentation/screens/library_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:music_player_final/presentation/widget/album_art_widget.dart';
+import 'package:music_player_final/models/track.dart';
+import 'package:music_player_final/presentation/widget/track_list_widget.dart';
 import '../../controller/library_controller.dart';
 import '../../controller/library_state.dart';
 import '../../controller/playback_controller.dart';
@@ -71,21 +72,7 @@ class LibraryScreen extends StatelessWidget {
             );
           }
 
-          // Empty
-          if (state.tracks.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.library_music, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('No music found', style: TextStyle(fontSize: 18)),
-                ],
-              ),
-            );
-          }
-
-          // Track list
+          // Track list with header
           return Column(
             children: [
               // Header
@@ -107,53 +94,21 @@ class LibraryScreen extends StatelessWidget {
                 ),
               ),
 
-              // Track list
+              // Reusable track list
               Expanded(
-                child: ListView.builder(
-                  itemCount: state.tracks.length,
-                  itemBuilder: (context, index) {
-                    final track = state.tracks[index];
-
-                    return ListTile(
-                      // USE AlbumArtWidget instead of Container
-                      leading: AlbumArtWidget(albumId: track.albumId, size: 50),
-
-                      title: Text(
-                        track.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
+                child: TrackListWidget(
+                  tracks: state.tracks,
+                  onTrackTap: (track, index) {
+                    context.read<PlaybackController>().play(track);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Playing: ${track.title}'),
+                        duration: Duration(seconds: 2),
                       ),
-
-                      subtitle: Text(
-                        track.artist ?? 'Unknown Artist',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-
-                      trailing: track.duration != null
-                          ? Text(
-                              _formatDuration(track.duration!),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
-                            )
-                          : null,
-
-                      onTap: () {
-                        context.read<PlaybackController>().play(track);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Playing: ${track.title}'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                      },
                     );
+                  },
+                  onTrackLongPress: (track, index) {
+                    _showTrackOptions(context, track);
                   },
                 ),
               ),
@@ -164,8 +119,40 @@ class LibraryScreen extends StatelessWidget {
     );
   }
 
-  String _formatDuration(Duration d) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    return '${twoDigits(d.inMinutes)}:${twoDigits(d.inSeconds % 60)}';
+  void _showTrackOptions(BuildContext context, Track track) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.play_arrow),
+              title: Text('Play'),
+              onTap: () {
+                Navigator.pop(context);
+                context.read<PlaybackController>().play(track);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.playlist_add),
+              title: Text('Add to queue'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Add to queue
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.playlist_add_check),
+              title: Text('Add to playlist'),
+              onTap: () {
+                Navigator.pop(context);
+                // TODO: Show playlist picker
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
