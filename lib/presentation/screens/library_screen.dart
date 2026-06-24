@@ -1,13 +1,15 @@
 // lib/presentation/screens/library_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:music_player_final/models/track.dart';
+import 'package:music_player_final/presentation/screens/search_screen.dart';
 import 'package:music_player_final/presentation/widget/track_list_widget.dart';
 import '../../controller/library_controller.dart';
 import '../../controller/library_state.dart';
 import '../../controller/playback_controller.dart';
 
 class LibraryScreen extends StatelessWidget {
+  const LibraryScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +20,26 @@ class LibraryScreen extends StatelessWidget {
         title: Text('Library'),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              final playbackController = context.read<PlaybackController>();
+              final tracks = context.read<LibraryController>().state.tracks;
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, _, _) => SearchScreen(
+                    tracks: tracks,
+                    playbackController: playbackController,
+                  ),
+                  transitionsBuilder: (_, animation, _, child) =>
+                      FadeTransition(opacity: animation, child: child),
+                  transitionDuration: const Duration(milliseconds: 250),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
             onPressed: () {
               context.read<LibraryController>().scanAllMusic();
             },
@@ -80,37 +101,11 @@ class LibraryScreen extends StatelessWidget {
             onSortOptionChanged: (option) {
               context.read<LibraryController>().setSortOption(option);
             },
-            onTrackTap: (track, index) {
-              context.read<PlaybackController>().play(track);
-            },
-            onTrackMenuTap: (track, index) {
-              _showTrackOptions(context, track);
-            },
+            playbackController: context.read<PlaybackController>(),
           );
         },
       ),
     );
   }
 
-  void _showTrackOptions(BuildContext context, Track track) {
-    final playbackController = context.read<PlaybackController>();
-    showModalBottomSheet(
-      context: context,
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.play_arrow),
-              title: Text('Play'),
-              onTap: () {
-                Navigator.pop(sheetContext);
-                playbackController.play(track);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

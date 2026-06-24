@@ -55,7 +55,8 @@ class MediaStorePlugin : FlutterPlugin, MethodCallHandler {
             MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DATE_ADDED
+            MediaStore.Audio.Media.DATE_ADDED,
+            MediaStore.Audio.Media.GENRE
         )
 
         val selection = null  // Get all audio files
@@ -78,6 +79,7 @@ class MediaStorePlugin : FlutterPlugin, MethodCallHandler {
             val pathColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
             val durationColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
             val dateAddedColumn = it.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)
+            val genreColumn = it.getColumnIndex(MediaStore.Audio.Media.GENRE)
 
             while (it.moveToNext()) {
                 val id = it.getLong(idColumn)
@@ -88,6 +90,7 @@ class MediaStorePlugin : FlutterPlugin, MethodCallHandler {
                 val path = it.getString(pathColumn)
                 val duration = it.getLong(durationColumn)
                 val dateAdded = it.getLong(dateAddedColumn)
+                val genre = if (genreColumn >= 0) it.getString(genreColumn) else null
 
                 tracks.add(
                     mapOf(
@@ -98,7 +101,8 @@ class MediaStorePlugin : FlutterPlugin, MethodCallHandler {
                         "filePath" to path,
                         "duration" to duration,
                         "albumId" to albumId,
-                        "dateAdded" to dateAdded
+                        "dateAdded" to dateAdded,
+                        "genre" to genre
                     )
                 )
             }

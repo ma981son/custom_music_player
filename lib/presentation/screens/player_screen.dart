@@ -5,6 +5,8 @@ import 'package:music_player_final/presentation/widget/album_art_widget.dart';
 import '../../controller/playback_state.dart';
 
 class PlayerScreen extends StatelessWidget {
+  const PlayerScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +53,10 @@ class PlayerScreen extends StatelessWidget {
                     width: double.infinity,
                     child: Text(
                       track.title,
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
@@ -76,7 +81,9 @@ class PlayerScreen extends StatelessWidget {
                   SizedBox(height: 16),
                   IconButton(
                     icon: Icon(
-                      state.isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                      state.isPlaying
+                          ? Icons.pause_circle_filled
+                          : Icons.play_circle_filled,
                       size: 72,
                       color: Colors.blue,
                     ),

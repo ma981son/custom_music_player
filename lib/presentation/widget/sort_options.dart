@@ -53,7 +53,7 @@ class SortOptionsPanel extends StatelessWidget {
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.horizontal(left: Radius.circular(16)),
-      child: Container(
+      child: SizedBox(
         width: 280,
         height: double.infinity,
         child: SafeArea(

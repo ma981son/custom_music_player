@@ -13,6 +13,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Create services
@@ -40,6 +42,8 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
   @override
   State<MainScreen> createState() => _MainScreenState();
 }

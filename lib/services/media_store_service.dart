@@ -15,11 +15,12 @@ class MediaStoreService {
       print('MediaStore: Found ${result.length} tracks');
 
       return result.map((data) {
-        final track = Track(
+        return Track(
           id: data['id'] as String,
           title: data['title'] as String? ?? 'Unknown Title',
           artist: data['artist'] as String?,
           album: data['album'] as String?,
+          genre: data['genre'] as String?,
           filePath: data['filePath'] as String,
           duration: data['duration'] != null
               ? Duration(milliseconds: (data['duration'] as int))
@@ -31,13 +32,6 @@ class MediaStoreService {
                 )
               : null,
         );
-
-        // DEBUG: Print first track's albumId
-        if (result.indexOf(data) == 0) {
-          print('First track: ${track.title}, albumId: ${track.albumId}');
-        }
-
-        return track;
       }).toList();
     } on PlatformException catch (e) {
       print('MediaStore error: ${e.message}');

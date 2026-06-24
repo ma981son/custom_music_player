@@ -8,8 +8,7 @@ class AlbumArtWidget extends StatefulWidget {
   final int? albumId;
   final double size;
 
-  const AlbumArtWidget({Key? key, required this.albumId, this.size = 50})
-    : super(key: key);
+  const AlbumArtWidget({super.key, required this.albumId, this.size = 50});
 
   @override
   State<AlbumArtWidget> createState() => _AlbumArtWidgetState();

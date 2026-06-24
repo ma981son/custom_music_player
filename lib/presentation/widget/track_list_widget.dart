@@ -1,9 +1,10 @@
-// lib/presentation/widgets/track_list_widget.dart
 import 'package:flutter/material.dart';
+import 'package:music_player_final/controller/playback_controller.dart';
 import 'package:music_player_final/models/sort_option.dart';
 import 'package:music_player_final/models/track.dart';
 import 'package:music_player_final/presentation/widget/shuffle_bar_widget.dart';
 import 'album_art_widget.dart';
+import 'playable_track_tile.dart';
 
 class TrackListWidget extends StatelessWidget {
   final List<Track> tracks;
@@ -20,6 +21,7 @@ class TrackListWidget extends StatelessWidget {
   final EdgeInsets? padding;
   final SortOption currentSortOption;
   final void Function(SortOption option)? onSortOptionChanged;
+  final PlaybackController? playbackController;
 
   const TrackListWidget({
     super.key,
@@ -37,6 +39,7 @@ class TrackListWidget extends StatelessWidget {
     this.onSortOptionChanged,
     this.onTrackMenuTap,
     this.showTrackMenu = true,
+    this.playbackController,
   });
 
   @override
@@ -68,7 +71,9 @@ class TrackListWidget extends StatelessWidget {
           ShuffleBarWidget(
             tracks: tracks,
             onShuffleTap: onShuffleTap,
-            onFallbackTap: onTrackTap,
+            onFallbackTap: playbackController != null
+                ? (t, i) => playbackController!.play(t)
+                : onTrackTap,
             currentSortOption: currentSortOption,
             onSortOptionChanged: onSortOptionChanged,
           ),
@@ -80,6 +85,15 @@ class TrackListWidget extends StatelessWidget {
             itemBuilder: (context, index) {
               final track = tracks[index];
 
+              if (playbackController != null) {
+                return PlayableTrackTile(
+                  key: ValueKey(track.filePath),
+                  track: track,
+                  index: index,
+                  playbackController: playbackController!,
+                );
+              }
+
               return TrackListTile(
                 key: ValueKey(track.filePath),
                 track: track,
@@ -87,15 +101,9 @@ class TrackListWidget extends StatelessWidget {
                 showTrackNumber: showTrackNumber,
                 showDuration: showDuration,
                 showTrackMenu: showTrackMenu,
-                onTap: onTrackTap != null
-                    ? () => onTrackTap!(track, index)
-                    : null,
-                onLongPress: onTrackLongPress != null
-                    ? () => onTrackLongPress!(track, index)
-                    : null,
-                onTrackMenuTap: onTrackMenuTap != null
-                    ? () => onTrackMenuTap!(track, index)
-                    : null,
+                onTap: onTrackTap != null ? () => onTrackTap!(track, index) : null,
+                onLongPress: onTrackLongPress != null ? () => onTrackLongPress!(track, index) : null,
+                onTrackMenuTap: onTrackMenuTap != null ? () => onTrackMenuTap!(track, index) : null,
                 trailing: trailingBuilder?.call(track, index),
               );
             },
