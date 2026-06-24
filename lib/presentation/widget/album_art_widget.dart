@@ -23,19 +23,11 @@ class _AlbumArtWidgetState extends State<AlbumArtWidget> {
   @override
   void initState() {
     super.initState();
-    print(
-      'AlbumArtWidget: initState called with albumId: ${widget.albumId}',
-    ); // DEBUG
     _loadAlbumArt();
   }
 
   Future<void> _loadAlbumArt() async {
-    print(
-      'AlbumArtWidget: _loadAlbumArt called for albumId: ${widget.albumId}',
-    ); // DEBUG
-
     if (widget.albumId == null) {
-      print('AlbumArtWidget: albumId is null, showing error'); // DEBUG
       setState(() => _hasError = true);
       return;
     }
@@ -43,30 +35,21 @@ class _AlbumArtWidgetState extends State<AlbumArtWidget> {
     setState(() => _isLoading = true);
 
     try {
-      print('AlbumArtWidget: Creating MediaStoreService...'); // DEBUG
       final mediaStore = MediaStoreService();
-
-      print(
-        'AlbumArtWidget: Calling getAlbumArt for albumId: ${widget.albumId}',
-      ); // DEBUG
       final base64String = await mediaStore.getAlbumArt(widget.albumId!);
 
       if (base64String != null && mounted) {
-        print('AlbumArtWidget: Got base64 data, decoding...'); // DEBUG
         setState(() {
           _imageBytes = base64Decode(base64String);
           _isLoading = false;
         });
-        print('AlbumArtWidget: Image loaded successfully'); // DEBUG
       } else if (mounted) {
-        print('AlbumArtWidget: No album art returned'); // DEBUG
         setState(() {
           _hasError = true;
           _isLoading = false;
         });
       }
     } catch (e) {
-      print('AlbumArtWidget: Error loading album art: $e'); // DEBUG
       if (mounted) {
         setState(() {
           _hasError = true;

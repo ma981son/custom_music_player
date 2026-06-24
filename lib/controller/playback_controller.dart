@@ -17,13 +17,9 @@ class PlaybackController extends Cubit<PlaybackState> {
     });
   }
 
-  /// Start playing a track
   Future<void> play(Track track) async {
-    // Tell the audio service to play
+    emit(state.copyWith(currentTrack: track, isPlaying: true, position: Duration.zero));
     await _audioService.playTrack(track.filePath);
-
-    // Update our state (this automatically updates the UI)
-    emit(state.copyWith(currentTrack: track, isPlaying: true));
   }
 
   /// Pause the current track

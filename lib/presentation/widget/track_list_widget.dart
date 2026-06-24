@@ -9,10 +9,12 @@ class TrackListWidget extends StatelessWidget {
   final List<Track> tracks;
   final void Function(Track track, int index)? onTrackTap;
   final void Function(Track track, int index)? onTrackLongPress;
+  final void Function(Track track, int index)? onTrackMenuTap;
   final Widget Function(Track track, int index)? trailingBuilder;
   final bool showTrackNumber;
   final bool showDuration;
   final bool showShuffleBar;
+  final bool showTrackMenu;
   final void Function(Track track, int index)? onShuffleTap;
   final ScrollController? scrollController;
   final EdgeInsets? padding;
@@ -33,6 +35,8 @@ class TrackListWidget extends StatelessWidget {
     this.onShuffleTap,
     required this.currentSortOption,
     this.onSortOptionChanged,
+    this.onTrackMenuTap,
+    this.showTrackMenu = true,
   });
 
   @override
@@ -42,11 +46,16 @@ class TrackListWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.music_off, size: 64, color: Colors.grey[400]),
+            Icon(Icons.library_music_outlined, size: 72, color: Colors.grey[300]),
             SizedBox(height: 16),
             Text(
-              'No tracks',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              'No songs found',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey[600]),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Try refreshing your library',
+              style: TextStyle(fontSize: 14, color: Colors.grey[400]),
             ),
           ],
         ),
@@ -77,11 +86,15 @@ class TrackListWidget extends StatelessWidget {
                 index: index,
                 showTrackNumber: showTrackNumber,
                 showDuration: showDuration,
+                showTrackMenu: showTrackMenu,
                 onTap: onTrackTap != null
                     ? () => onTrackTap!(track, index)
                     : null,
                 onLongPress: onTrackLongPress != null
                     ? () => onTrackLongPress!(track, index)
+                    : null,
+                onTrackMenuTap: onTrackMenuTap != null
+                    ? () => onTrackMenuTap!(track, index)
                     : null,
                 trailing: trailingBuilder?.call(track, index),
               );
@@ -98,8 +111,10 @@ class TrackListTile extends StatelessWidget {
   final int index;
   final bool showTrackNumber;
   final bool showDuration;
+  final bool showTrackMenu;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
+  final VoidCallback? onTrackMenuTap;
   final Widget? trailing;
 
   const TrackListTile({
@@ -108,8 +123,10 @@ class TrackListTile extends StatelessWidget {
     required this.index,
     this.showTrackNumber = false,
     this.showDuration = true,
+    this.showTrackMenu = true,
     this.onTap,
     this.onLongPress,
+    this.onTrackMenuTap,
     this.trailing,
   });
 
@@ -145,17 +162,45 @@ class TrackListTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(color: Colors.grey[600], fontSize: 14),
       ),
-      trailing:
-          trailing ??
-          (showDuration && track.duration != null
-              ? Text(
-                  _formatDuration(track.duration!),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                )
-              : null),
+      trailing: trailing ?? _buildDefaultTrailing(),
       onTap: onTap,
       onLongPress: onLongPress,
     );
+  }
+
+  Widget? _buildDefaultTrailing() {
+    // If menu is enabled, show menu button
+    if (showTrackMenu) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (showDuration && track.duration != null) ...[
+            Text(
+              _formatDuration(track.duration!),
+              style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            ),
+            SizedBox(width: 8),
+          ],
+          IconButton(
+            icon: Icon(Icons.more_vert),
+            onPressed: onTrackMenuTap,
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(),
+            iconSize: 20,
+          ),
+        ],
+      );
+    }
+
+    // Otherwise, just show duration if available
+    if (showDuration && track.duration != null) {
+      return Text(
+        _formatDuration(track.duration!),
+        style: TextStyle(color: Colors.grey[600], fontSize: 12),
+      );
+    }
+
+    return null;
   }
 
   String _formatDuration(Duration d) {

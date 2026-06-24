@@ -12,19 +12,12 @@ class LibraryController extends Cubit<LibraryState> {
 
   LibraryController(this._scannerService) : super(LibraryState());
 
-  /// Load library if not already loaded (called on startup)
   Future<void> scanAllMusicIfNeeded() async {
-    if (_hasLoaded && state.tracks.isNotEmpty) {
-      print('Library already loaded');
-      return;
-    }
-
+    if (_hasLoaded && state.tracks.isNotEmpty) return;
     await scanAllMusic();
   }
 
-  /// Load library from MediaStore
   Future<void> scanAllMusic() async {
-    print('Controller: Loading library from MediaStore...');
     emit(state.copyWith(isScanning: true, errorMessage: null));
 
     try {
@@ -40,11 +33,11 @@ class LibraryController extends Cubit<LibraryState> {
           sortOption: savedSortOption,
         ),
       );
-
-      print('Controller: Library loaded, ${tracks.length} tracks');
     } catch (e) {
-      print('Controller: Error loading library: $e');
-      emit(state.copyWith(isScanning: false, errorMessage: e.toString()));
+      final message = e.toString().toLowerCase().contains('permission')
+          ? 'Music access was denied.\nPlease grant storage permission in your device settings.'
+          : 'Could not load your music library.\nPlease try again.';
+      emit(state.copyWith(isScanning: false, errorMessage: message));
     }
   }
 
@@ -65,7 +58,7 @@ class LibraryController extends Cubit<LibraryState> {
     if (saved != null) {
       return SortOption.values.byName(saved);
     }
-    return SortOption.titleAsc;
+    return SortOption.dateAddedDesc;
   }
 
   List<Track> _sortTracks(List<Track> tracks, SortOption option) {

@@ -73,23 +73,19 @@ class LibraryScreen extends StatelessWidget {
           }
 
           // Track list with header
-          return Column(
-            children: [
-              // Reusable track list
-              Expanded(
-                child: TrackListWidget(
-                  tracks: state.tracks,
-                  showShuffleBar: true,
-                  currentSortOption: state.sortOption,
-                  onSortOptionChanged: (option) {
-                    context.read<LibraryController>().setSortOption(option);
-                  },
-                  onTrackTap: (track, index) {
-                    context.read<PlaybackController>().play(track);
-                  },
-                ),
-              ),
-            ],
+          return TrackListWidget(
+            tracks: state.tracks,
+            showShuffleBar: true,
+            currentSortOption: state.sortOption,
+            onSortOptionChanged: (option) {
+              context.read<LibraryController>().setSortOption(option);
+            },
+            onTrackTap: (track, index) {
+              context.read<PlaybackController>().play(track);
+            },
+            onTrackMenuTap: (track, index) {
+              _showTrackOptions(context, track);
+            },
           );
         },
       ),
@@ -97,9 +93,10 @@ class LibraryScreen extends StatelessWidget {
   }
 
   void _showTrackOptions(BuildContext context, Track track) {
+    final playbackController = context.read<PlaybackController>();
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -107,24 +104,8 @@ class LibraryScreen extends StatelessWidget {
               leading: Icon(Icons.play_arrow),
               title: Text('Play'),
               onTap: () {
-                Navigator.pop(context);
-                context.read<PlaybackController>().play(track);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.playlist_add),
-              title: Text('Add to queue'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Add to queue
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.playlist_add_check),
-              title: Text('Add to playlist'),
-              onTap: () {
-                Navigator.pop(context);
-                // TODO: Show playlist picker
+                Navigator.pop(sheetContext);
+                playbackController.play(track);
               },
             ),
           ],
